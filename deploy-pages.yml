@@ -28,6 +28,13 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Verify build output
+        run: |
+          echo "Listing dist/public"
+          ls -la ./dist/public || true
+          echo "Show index.html head"
+          if [ -f ./dist/public/index.html ]; then head -n 10 ./dist/public/index.html; else echo "index.html not found"; fi
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
