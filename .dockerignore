@@ -1,0 +1,14 @@
+node_modules
+dist
+.git
+.gitignore
+pnpm-store
+**/node_modules
+.DS_Store
+*.log
+coverage
+/.parcel-cache
+/.turbo
+build
+tmp
+local-env
