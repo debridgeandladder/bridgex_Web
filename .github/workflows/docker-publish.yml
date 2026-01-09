@@ -1,0 +1,43 @@
+name: Build and Push Docker image to DigitalOcean Container Registry
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  IMAGE_NAME: bridgex
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Login to DigitalOcean Container Registry
+        run: doctl registry login
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          platforms: linux/amd64
+          tags: |
+            registry.digitalocean.com/${{ secrets.DO_REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            registry.digitalocean.com/${{ secrets.DO_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+      - name: Print image location
+        run: echo "Pushed images to registry.digitalocean.com/${{ secrets.DO_REGISTRY }}/${{ env.IMAGE_NAME }}"
